@@ -1,5 +1,6 @@
 <div class="form-container">
-    <%= form_for @raffle, :url => {:action => 'create'}, :html => {:method => :post} do |f| %>
+    <%= error_messages_for :raffle %>
+    <%= form_for @raffle, :url => { :action => 'create' }, :html => { :method => :post } do |f| %>
         <fieldset>
             <div>
                 <label for="raffle_title">Title</label>

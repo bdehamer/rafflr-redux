@@ -21,11 +21,15 @@ class RafflesController < ApplicationController
     @raffle = Raffle.new(raffle_params)
     @users = params[:users]
     @delay = params[:delay]
-    users = @users.gsub("\r","").split("\n").map{|u| u.strip}
-    users.each {|user| @raffle.users << User.new(:name => user, :raffle => @raffle)}
+    users = @users.gsub("\r","").split("\n").map{ |u| u.strip }
+    users.each do |user|
+      new_user = User.new(:name => user, :raffle => @raffle, winner: false)
+      @raffle.users << new_user
+    end
 
     if @raffle.save
-      redirect_to raffle_url(:id => @raffle, :delay => @delay )
+      set_session_variables(@raffle)
+      redirect_to raffle_path(@raffle, :delay => @delay)
     else
       render :action => 'new'
     end
@@ -36,10 +40,8 @@ class RafflesController < ApplicationController
     # or give them the option to re-run it
     @raffle = Raffle.find(params[:id])
     @users = @raffle.users
-    @users.each { |user| user.winner = false; user.save }
     @delay = params[:delay]
-    session[:users] = @users # going to need this in "raffle"
-    session[:number_of_winners] = @raffle.number_of_winners.to_i
+    set_session_variables(@raffle)
     @page_title = "#{@raffle.title}"
   end
 
@@ -55,21 +57,20 @@ class RafflesController < ApplicationController
       # haha you're a loser
       loser = session[:users].pop
       loser2id = 'null'
-      if @delay < 1 
+      if @delay < 1
         if session[:users].size > session[:number_of_winners]
           loser2id = session[:users].pop.id
         end
       end
       begin
         session[:users].each do |user|
-          user.winner = true
-          user.save
+          u = User.find(user["id"])
+          u.winner = true
+          u.save
         end
       end if (session[:users].size == session[:number_of_winners])
 
-      render :update do |page|
-        page << "remove_user(#{loser.id}, #{loser2id})" # remove the user from the page
-      end
+      render js: "remove_user(#{loser["id"]}, #{loser2id})"
     end if session[:users].size > session[:number_of_winners]
 
   end
@@ -81,6 +82,13 @@ class RafflesController < ApplicationController
 
   def raffle_params
     params.require(:raffle).permit(:title, :number_of_winners, :users, :delay, :commit)
+  end
+
+  def set_session_variables(raffle)
+    session[:users] = []
+    session[:number_of_winners] = 0
+    session[:users] = raffle.users
+    session[:number_of_winners] = raffle.number_of_winners.to_i
   end
 
 end

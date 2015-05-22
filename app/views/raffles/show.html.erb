@@ -3,27 +3,34 @@
   // Kick things off; the process function will kick off each
   // subsequent round after all the special effects are complete.    
   setTimeout(next_round, 500);
+
+  soundManager.debugMode = false;
+  soundManager.flashVersion = 9;
+  soundManager.multiShot = false;
+  soundManager.url = "<%= asset_path('soundmanager2.swf') %>";
+  soundManager.useHTML5Audio = true;
+  soundManager.consoleOnly = true;
   soundManager.onload = function() {
     playMusic('/songs/Jeopardy.mp3');
   }
-    
+
   function next_round() {
     // Controller will call the remove_user function with the next user id
-    new Ajax.Request('<%= url_for(:action => 'raffle', :id => @raffle, :delay => @delay) %>', 
+    new Ajax.Request('<%= raffles_raffle_path(:format => :js, :id => @raffle.id, :delay => @delay) %>',
           {
-              asynchronous:true, 
+              asynchronous:true,
               evalScripts:true
           }
       );
   }
-  
+
   function remove_user(user_id, extra_user) {
     process(user_id, next_round, extra_user);
   }
   <% if params[:delay] %>
     nextRoundDelayMs = '<%= params[:delay] %>';
   <% end %>
-    
+
 </script>
 
 <span id="new_raffle" style="display: none;"><%= link_to 'New Raffle', new_raffle_path %></span>

@@ -1,12 +1,14 @@
 source 'https://rubygems.org'
 
+ruby "2.2.2"
+
 gem 'soundmanager2-rails'
 gem 'annotate_models'
 gem 'will_paginate'
 gem 'dynamic_form'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.1'
+gem 'rails', '4.2.3'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use SCSS for stylesheets

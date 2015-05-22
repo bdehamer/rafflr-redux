@@ -1,4 +1,10 @@
-//= require_tree .
+//= require prototype
+//= require effects
+//= require yahoo-min
+//= require JSFX_Layer
+//= require JSFX_Fireworks2
+//= require JSFX_Browser
+//= require soundmanager2
 
 var nextRoundDelayMs = 1500;
 var nextRoundTimerDelayMs = 1;
